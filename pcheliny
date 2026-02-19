@@ -1,0 +1,49 @@
+import numpy as np
+
+# Objective function
+def objective_function(x, y):
+    return (x + 2*y - 7) ** 2 + (2 * x + y - 5) ** 2
+# Bee class
+class Bee:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.value = objective_function(x, y)
+# Bee Colony Optimization function
+def bee_colony_optimization(iterations, num_scouts, num_best, num_selected, num_elite, area_size):
+    scouts = [Bee(np.random.uniform(-10, 10), np.random.uniform(-10, 10)) for _ in range(num_scouts)]
+    for _ in range(iterations):
+        scouts.sort(key=lambda bee: bee.value)
+        best_scouts = scouts[:num_best]
+        selected_scouts = scouts[:num_selected]
+        for bee in best_scouts:
+            x_lower = max(bee.x - area_size, -10)
+            x_upper = min(bee.x + area_size, 10)
+            y_lower = max(bee.y - area_size, -10)
+            y_upper = min(bee.y + area_size, 10)
+            for _ in range(num_elite):
+                new_x = np.random.uniform(max(x_lower, -10), min(x_upper, 10))
+                new_y = np.random.uniform(max(y_lower, -10), min(y_upper, 10))
+                selected_scouts.append(Bee(new_x, new_y))
+
+        selected_scouts.sort(key=lambda bee: bee.value)
+        scouts = selected_scouts[:num_scouts]
+
+    # Return the best solution found
+    best_solution = min(scouts, key=lambda bee: bee.value)
+    return best_solution.x, best_solution.y, best_solution.value
+# Parameters
+iterations = 50
+num_scouts = 10
+num_best = 2
+num_selected = 3
+num_elite = 5
+area_size = 2  # Reduce the search space for better accuracy
+
+# Run Bee Colony Optimization
+best_x, best_y, best_value = bee_colony_optimization(iterations, num_scouts, num_best, num_selected, num_elite, area_size)
+# Print results
+print("Best Solution:")
+print("x =", best_x)
+print("y =", best_y)
+print("Objective Value =", best_value)
